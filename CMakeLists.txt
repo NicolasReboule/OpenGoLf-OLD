@@ -10,23 +10,27 @@ endif()
 
 include_directories(
         include
+        include/utils
         include/extern
         include/extern/Cyclone
 )
 
 file(GLOB_RECURSE CYCLONE_FILES src/extern/Cyclone/*.cpp include/extern/Cyclone/*.h)
+file(GLOB_RECURSE UTILS_FILES src/utils/*.cpp include/utils/*.h)
 
 add_executable (${PROJECT_NAME} main.cpp
         ${CYCLONE_FILES}
+        ${UTILS_FILES}
         src/extern/gl3w.c
         src/Window.cpp
-        src/utils/Viewer.cpp
+        src/SkyBox.cpp
 )
 
 #find_package(OpenGL REQUIRED)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
         include
+        include/utils
         include/extern
         include/extern/Cyclone
 )

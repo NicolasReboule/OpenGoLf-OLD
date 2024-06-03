@@ -1,0 +1,11 @@
+#include "stb-master/tests/prerelease/stb_lib.h"
+#define STB_LIB_IMPLEMENTATION
+#include "stb-master/tests/prerelease/stb_lib.h"
+
+//#define STB_REGEX_IMPLEMENTATION
+//#include "stb_regex.h"
+
+int main(int argc, char **argv)
+{
+
+}

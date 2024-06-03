@@ -8,10 +8,14 @@
 #include "utils/Viewer.hpp"
 #include "utils/Loader.h"
 #include "GLFW/glfw3.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "SkyBox.hpp"
 
-const float DEFAULT_VIEW_POINT[3] = { 5, 5, 5 };
-const float DEFAULT_VIEW_CENTER[3] = { 0, 0, 0 };
-const float DEFAULT_UP_VECTOR[3] = { 0, 1, 0 };
+constexpr float DEFAULT_VIEW_POINT[3] = { 5, 5, 5 };
+constexpr float DEFAULT_VIEW_CENTER[3] = { 0, 0, 0 };
+constexpr float DEFAULT_UP_VECTOR[3] = { 0, 1, 0 };
 
 class Window {
 public:
@@ -35,7 +39,7 @@ public:
 
     static void mouseEvents(GLFWwindow *window, int button, int action, int mods);
 
-    static void mouseDragging(double width, double height);
+    static void mouseDragging();
 
     void setCursorPos(float x, float y);
 
@@ -64,9 +68,25 @@ public:
     [[nodiscard]] inline std::unique_ptr<Viewer> &getViewer() { return _viewer; }
 
 private:
+    Window(int w, int h);
+
+    void setSize(int w, int h);
+
+    void setAspect(float aspect);
+
+    void init();
+
+    void initSkyBox();
+
+    void drawSkyBox(glm::mat4 view, glm::vec3 eye);
+
+private:
     static std::unique_ptr<Window> _instance;
 
     std::unique_ptr<Viewer> _viewer;
+
+    std::unique_ptr<ShaderProgram> _shaderSkyBox;
+    std::unique_ptr<SkyBox> _skyBox;
 
     int _width;
     int _height;
@@ -74,12 +94,6 @@ private:
     bool _left_button_down = false, _right_button_down = false, _middle_button_down = false;
     glm::vec2 _cursor_pos = glm::vec2(0, 0);
     glm::vec2 _last_cursor_pos = glm::vec2(0, 0);
-
-    Window(int w, int h);
-
-    void setSize(int w, int h);
-
-    void setAspect(float aspect);
 };
 
 #endif //OpenGoLf_WINDOW_HPP

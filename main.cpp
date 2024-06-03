@@ -8,7 +8,13 @@
 #include "GLFW/glfw3.h"
 #include "cyclone.h"
 
-void window()
+constexpr struct WindowSettings {
+    int width = 800;
+    int height = 600;
+    const char *title = "OpenGL FrameWork";
+} windowSettings;
+
+static void window()
 {
     if (!glfwInit())
     {
@@ -18,9 +24,8 @@ void window()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    int width = 800;
-    int height = 800;
-    GLFWwindow *glWindow = glfwCreateWindow(width, height, "OpenGL FrameWork", NULL, NULL);
+
+    GLFWwindow *glWindow = glfwCreateWindow(windowSettings.width, windowSettings.height, windowSettings.title, nullptr, nullptr);
 
     if (!glWindow)
     {
@@ -44,7 +49,7 @@ void window()
     glfwSwapInterval(1);
     printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION),glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    std::unique_ptr<Window> &window = Window::getInstance(width, height);
+    std::unique_ptr<Window> &window = Window::getInstance(windowSettings.height, windowSettings.height);
 
     glfwSetWindowTitle(glWindow, "MyOpenGLWindow");
     glfwSetWindowSizeCallback(glWindow, window->resize);
@@ -59,16 +64,13 @@ void window()
         window->draw();
         glfwSwapBuffers(glWindow);
         glfwPollEvents();
-        window->mouseDragging(width, height);
+        window->mouseDragging();
     }
-
     glfwDestroyWindow(glWindow);
     glfwTerminate();
 }
 
 int main() {
-    cyclone::Vector3 v1(1, 2, 3);
-    std::cout << "Vector 1: " << v1.toString() << std::endl;
     window();
     return 0;
 }
