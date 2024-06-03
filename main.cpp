@@ -49,7 +49,7 @@ static void window()
     glfwSwapInterval(1);
     printf("OpenGL %s, GLSL %s\n", glGetString(GL_VERSION),glGetString(GL_SHADING_LANGUAGE_VERSION));
 
-    std::unique_ptr<Window> &window = Window::getInstance(windowSettings.height, windowSettings.height);
+    std::unique_ptr<Window> &window = Window::getInstance(windowSettings.width, windowSettings.height);
 
     glfwSetWindowTitle(glWindow, "MyOpenGLWindow");
     glfwSetWindowSizeCallback(glWindow, window->resize);

@@ -10,13 +10,13 @@ std::unique_ptr<Window> Window::_instance = nullptr;
 
 Window::Window(int w, int h) {
     _width = w;
-    _height = w;
+    _height = h;
 
     glm::vec3 viewPoint(DEFAULT_VIEW_POINT[0], DEFAULT_VIEW_POINT[1], DEFAULT_VIEW_POINT[2]);
     glm::vec3 viewCenter(DEFAULT_VIEW_CENTER[0], DEFAULT_VIEW_CENTER[1], DEFAULT_VIEW_CENTER[2]);
     glm::vec3 upVector(DEFAULT_UP_VECTOR[0], DEFAULT_UP_VECTOR[1], DEFAULT_UP_VECTOR[2]);
 
-    float aspect = static_cast<float>(w) / static_cast<float>(h);
+    float aspect = static_cast<float>(_width) / static_cast<float>(_height);
     _viewer = std::make_unique<Viewer>(viewPoint, viewCenter, upVector, 45.0f, aspect);
     init();
 }
