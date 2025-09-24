@@ -25,18 +25,18 @@ static void window()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow *glWindow = glfwCreateWindow(windowSettings.width, windowSettings.height, windowSettings.title, nullptr, nullptr);
+    GLFWwindow *gl_window = glfwCreateWindow(windowSettings.width, windowSettings.height, windowSettings.title, nullptr, nullptr);
 
-    if (!glWindow)
+    if (!gl_window)
     {
         glfwTerminate();
         return;
     }
 
-    glfwMakeContextCurrent(glWindow);
+    glfwMakeContextCurrent(gl_window);
 
     if (gl3wInit()) {
-        fprintf(stderr, "failed to initialize OpenGL\n");
+        fprintf(stderr, "Failed to initialize OpenGL\n");
         return;
     }
 
@@ -51,26 +51,25 @@ static void window()
 
     std::unique_ptr<Window> &window = Window::getInstance(windowSettings.width, windowSettings.height);
 
-    glfwSetWindowTitle(glWindow, "MyOpenGLWindow");
-    glfwSetWindowSizeCallback(glWindow, window->resize);
-    glfwSetMouseButtonCallback(glWindow, window->mouseEvents);
-    glfwSetCursorPosCallback(glWindow, window->updateCursor);
-    glfwSetKeyCallback(glWindow, window->keyEvents);
+    glfwSetWindowTitle(gl_window, windowSettings.title);
+    glfwSetWindowSizeCallback(gl_window, window->resize);
+    glfwSetMouseButtonCallback(gl_window, window->mouseEvents);
+    glfwSetCursorPosCallback(gl_window, window->updateCursor);
+    glfwSetKeyCallback(gl_window, window->keyEvents);
 
-    while (!glfwWindowShouldClose(glWindow))
+    while (!glfwWindowShouldClose(gl_window))
     {
         glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        window->draw();
-        glfwSwapBuffers(glWindow);
         glfwPollEvents();
-        window->mouseDragging();
+        window->update();
+        window->draw();
+        glfwSwapBuffers(gl_window);
     }
-    glfwDestroyWindow(glWindow);
+    glfwDestroyWindow(gl_window);
     glfwTerminate();
 }
 
 int main() {
     window();
-    return 0;
 }
