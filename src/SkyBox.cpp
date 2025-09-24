@@ -6,79 +6,109 @@
 #include "stb-master/stb_image.h"
 
 SkyBox::SkyBox() {
+    initShader();
     loadCubeMap();
 }
 
-void SkyBox::draw() const {
-    glBindVertexArray(vaoHandle);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texID);
-    int size;
-    glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
-    glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, nullptr);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindVertexArray(0);
+void SkyBox::initShader() {
+    _shader = std::make_unique<ShaderProgram>();
+    _shader->initFromFiles("shaders/skybox/skybox.vert", "shaders/skybox/skybox.frag");
+
+    _shader->addUniform("MVP");
+
+    _shader->addUniform("CubeMapTex"); //cubemap texture
+}
+
+void SkyBox::draw(glm::mat3 view, glm::mat4 projection) const {
+    glm::mat4 translate = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    glm::mat4 rotate = glm::rotate(glm::mat4(1.0f), glm::radians(static_cast<float>(0.0f)), glm::vec3(1.0f, 0.0f, 0.0f));
+    rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(static_cast<float>(0.0f)), glm::vec3(0.0f, 1.0f, 0.0f));
+    rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(static_cast<float>(0.0f)), glm::vec3(0.0f, 0.0f, 1.0f));    glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.5, 0.5, 0.5));
+    glm::mat4 model = translate * rotate * scale; // Combination of transformation matrix
+
+    glm::mat4 skybox_view = glm::mat4(glm::mat3(view));
+    glm::mat4 mvp = projection * skybox_view * model;
+
+    _shader->use();
+
+    glUniformMatrix4fv(_shader->uniform("MVP"), 1, GL_FALSE, glm::value_ptr(mvp));
+
+    glUniform1i(_shader->uniform("CubeMapTex"), 0);
+
+    glDepthMask(GL_FALSE);
+    if (_vao) {
+        glBindVertexArray(_vao);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, _tex);
+        int size;
+        glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
+        glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, nullptr);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindVertexArray(0);
+    }
+    glDepthMask(GL_TRUE);
+    _shader->disable();
 }
 
 void SkyBox::loadCubeMap() {
-    float side = 500.0f; //size of cube
-    float side2 = side / 2.0f;
-    float v[24*3] = {
+    float size = 500.0f; //size of cube
+    float half_size = size / 2.0f;
+    float vertices[24 * 3] = {
 // Front
-            -side2, -side2, side2,
-            side2, -side2, side2,
-            side2, side2, side2,
-            -side2, side2, side2,
+            -half_size, -half_size, half_size,
+            half_size, -half_size, half_size,
+            half_size, half_size, half_size,
+            -half_size, half_size, half_size,
 // Right
-            side2, -side2, side2,
-            side2, -side2, -side2,
-            side2, side2, -side2,
-            side2, side2, side2,
+            half_size, -half_size, half_size,
+            half_size, -half_size, -half_size,
+            half_size, half_size, -half_size,
+            half_size, half_size, half_size,
 // Back
-            -side2, -side2, -side2,
-            -side2, side2, -side2,
-            side2, side2, -side2,
-            side2, -side2, -side2,
+            -half_size, -half_size, -half_size,
+            -half_size, half_size, -half_size,
+            half_size, half_size, -half_size,
+            half_size, -half_size, -half_size,
 // Left
-            -side2, -side2, side2,
-            -side2, side2, side2,
-            -side2, side2, -side2,
-            -side2, -side2, -side2,
+            -half_size, -half_size, half_size,
+            -half_size, half_size, half_size,
+            -half_size, half_size, -half_size,
+            -half_size, -half_size, -half_size,
 // Bottom
-            -side2, -side2, side2,
-            -side2, -side2, -side2,
-            side2, -side2, -side2,
-            side2, -side2, side2,
+            -half_size, -half_size, half_size,
+            -half_size, -half_size, -half_size,
+            half_size, -half_size, -half_size,
+            half_size, -half_size, half_size,
 // Top
-            -side2, side2, side2,
-            side2, side2, side2,
-            side2, side2, -side2,
-            -side2, side2, -side2
+            -half_size, half_size, half_size,
+            half_size, half_size, half_size,
+            half_size, half_size, -half_size,
+            -half_size, half_size, -half_size
     };
-    GLuint el[] = {
+    GLuint elements[] = {
             0,2,1, 0,3,2, 4,6,5, 4,7,6,
             8,10,9, 8,11,10, 12,14,13, 12,15,14,
             16,18,17, 16,19,18, 20,22,21, 20,23,22
     };
 
-    glGenVertexArrays(1, &vaoHandle);
-    glBindVertexArray(vaoHandle);
+    glGenVertexArrays(1, &_vao);
+    glBindVertexArray(_vao);
 
-    GLuint vboVerticesHandle;
-    glGenBuffers(1, &vboVerticesHandle);
-    glBindBuffer(GL_ARRAY_BUFFER, vboVerticesHandle);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(v), &v, GL_STATIC_DRAW);
+    GLuint vbo_vertices_handle;
+    glGenBuffers(1, &vbo_vertices_handle);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices_handle);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
     glEnableVertexAttribArray(0);
 
-    GLuint vboIndicesHandle;
-    glGenBuffers(1, &vboIndicesHandle);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesHandle);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(el), &el, GL_STATIC_DRAW);
+    GLuint vbo_elements_handle;
+    glGenBuffers(1, &vbo_elements_handle);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo_elements_handle);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), &elements, GL_STATIC_DRAW);
 
     glActiveTexture(GL_TEXTURE0);
-    glGenTextures(1, &texID); //set the texID as a member variable
-    glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
+    glGenTextures(1, &_tex); //set the texID as a member variable
+    glBindTexture(GL_TEXTURE_CUBE_MAP, _tex);
 
     const char *name[] = { "skybox_left", "skybox_right", "skybox_top", "skybox_bottom", "skybox_back", "skybox_front" };
     GLuint targets[] = {

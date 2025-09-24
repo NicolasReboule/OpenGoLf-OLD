@@ -8,21 +8,28 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <memory>
 #include <GL/gl3w.h>
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
+#include "Loader.h"
 
 class SkyBox {
 public:
     SkyBox();
 
-    void draw() const;
+    void draw(glm::mat3 view, glm::mat4 projection) const;
+
+private:
+    void initShader();
 
     void loadCubeMap();
-
-    [[nodiscard]] inline GLuint getTexID() const { return texID; }
 private:
-    unsigned int vaoHandle = 0;
+    GLuint _vao = 0;
 
-    GLuint texID = 0;
+    GLuint _tex = 0;
+
+    std::unique_ptr<ShaderProgram> _shader;
 };
 
 

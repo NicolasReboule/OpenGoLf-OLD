@@ -32,24 +32,16 @@ namespace cyclone {
     {
         // ... other World data as before ...
         /**
+         * Holds the maximum number of contacts allowed (i.e. the size
+         * of the contacts array).
+         */
+        unsigned maxContacts;
+
+        /**
          * True if the world should calculate the number of iterations
          * to give the contact resolver at each frame.
          */
         bool calculateIterations;
-
-        /**
-         * Holds a single rigid body in a linked list of bodies.
-         */
-        struct BodyRegistration
-        {
-            RigidBody *body;
-            BodyRegistration * next;
-        };
-
-        /**
-         * Holds the head of the list of registered bodies.
-         */
-        BodyRegistration *firstBody;
 
         /**
          * Holds the resolver for sets of contacts.
@@ -57,30 +49,10 @@ namespace cyclone {
         ContactResolver resolver;
 
         /**
-         * Holds one contact generators in a linked list.
-         */
-        struct ContactGenRegistration
-        {
-            ContactGenerator *gen;
-            ContactGenRegistration *next;
-        };
-
-        /**
-         * Holds the head of the list of contact generators.
-         */
-        ContactGenRegistration *firstContactGen;
-
-        /**
          * Holds an array of contacts, for filling by the contact
          * generators.
          */
         Contact *contacts;
-
-        /**
-         * Holds the maximum number of contacts allowed (i.e. the size
-         * of the contacts array).
-         */
-        unsigned maxContacts;
 
     public:
         /**
@@ -112,6 +84,33 @@ namespace cyclone {
          */
         void startFrame();
 
+        /**
+         * Holds a single rigid body in a linked list of bodies.
+         */
+        struct BodyRegistration
+        {
+            RigidBody *body;
+            BodyRegistration * next;
+        };
+
+        /**
+         * Holds the head of the list of registered bodies.
+         */
+        BodyRegistration *firstBody;
+
+        /**
+         * Holds one contact generators in a linked list.
+         */
+        struct ContactGenRegistration
+        {
+            ContactGenerator *gen;
+            ContactGenRegistration *next;
+        };
+
+        /**
+         * Holds the head of the list of contact generators.
+         */
+        ContactGenRegistration *firstContactGen;
     };
 
 } // namespace cyclone

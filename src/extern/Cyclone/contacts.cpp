@@ -178,7 +178,6 @@ void Contact::calculateDesiredDeltaVelocity(real duration)
         -thisRestitution * (contactVelocity.x - velocityFromAcc);
 }
 
-
 void Contact::calculateInternals(real duration)
 {
     // Check if the first object is NULL, and swap if it is.
@@ -187,7 +186,6 @@ void Contact::calculateInternals(real duration)
 
     // Calculate an set of axis at the contact point.
     calculateContactBasis();
-
     // Store the relative position of the contact relative to each body
     relativeContactPosition[0] = contactPoint - body[0]->getPosition();
     if (body[1]) {
