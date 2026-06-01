@@ -5,7 +5,7 @@
 
 ## Goals of the project
 
-The goal of the project is to solidify my experience in OpenGL and continue to learn and understand how graphical APIs work under the hood
+The goal of the project is to solidify my experience in OpenGL, continue to learn how graphical APIs work under the hood and mostly understand how to simulate physics.
 
 ## State of the project
 
